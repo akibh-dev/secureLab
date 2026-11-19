@@ -1,0 +1,13 @@
+node_modules
+dist
+.astro
+.turbo
+bun.lock
+playwright-report
+test-results
+SECURELAB_API_PROJECT_SPEC.md
+IMPLEMENTATION_GUIDE.md
+plan/
+.aws/
+.codex/
+.agents/

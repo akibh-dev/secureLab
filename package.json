@@ -1,0 +1,32 @@
+{
+  "name": "securelab",
+  "private": true,
+  "packageManager": "bun@1.4.3",
+  "engines": {
+    "node": "24.18.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --cwd apps/web dev",
+    "lint": "eslint . && prettier --check .",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "validate:labs": "bun scripts/validate-labs.ts",
+    "build": "bun run validate:labs && turbo run build",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^4",
+    "turbo": "^2",
+    "eslint": "^9",
+    "typescript-eslint": "^8",
+    "prettier": "^3",
+    "prettier-plugin-astro": "^0",
+    "@playwright/test": "^1"
+  }
+}

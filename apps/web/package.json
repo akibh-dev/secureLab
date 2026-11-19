@@ -1,0 +1,26 @@
+{
+  "name": "@securelab/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "astro": "^6",
+    "@astrojs/react": "^5",
+    "react": "^19",
+    "react-dom": "^19",
+    "@securelab/core": "workspace:*",
+    "@securelab/lab-schema": "workspace:*",
+    "@securelab/lab-content": "workspace:*",
+    "@securelab/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9",
+    "@types/react": "^19",
+    "@types/react-dom": "^19"
+  }
+}
