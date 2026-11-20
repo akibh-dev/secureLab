@@ -12,14 +12,14 @@
 |---|---|---|
 | [x] F1 | Record stack, architecture boundaries and owner inputs | Decision record names the six-lab MVP, static build and local progress model. |
 | [x] F2 | Create the workspaces and static shell | Fresh install serves a homepage and builds a top-level 404.html. |
-| [ ] F3 | Connect scripts and PR checks | A deliberately failing check blocks a test PR; a repaired commit passes. |
+| [ ] F3 | Connect local checks and mirrored-main CI | Local checks pass; record a GitHub Actions run for the same SHA as Forgejo main. |
 | [x] F4 | Publish the first handoff | Design and engine owners can each start from the same SHA and locate their write areas. |
 
 ## Foundation handoff
 
 The [foundation decision](../docs/decisions/0001-static-foundation.md) records the architecture and owner inputs. The [root README](../README.md) gives the clean-build and verification commands. Start design and engine work from the initial foundation commit on main. The catalog contract and examples live in packages/lab-schema/src.
 
-F3 includes a host-side acceptance test. The foundation workflow runs lint, type checks, catalog validation, unit tests, build and browser checks. On the Git host, require the foundation check and one approving review on main; verify a failing test PR blocks merge and its repaired commit passes. Record the PR and check URL when verified.
+F3 includes a host-side acceptance test. The foundation workflow runs lint, type checks, catalog validation, unit tests, build and browser checks. For the updated delivery workflow, attach the Forgejo PR and the successful GitHub run for its mirrored main SHA when available.
 
 ## Implementation details
 
@@ -27,7 +27,7 @@ F3 includes a host-side acceptance test. The foundation workflow runs lint, type
 2. Create a private root package with Bun workspaces for apps/* and packages/*, Turbo tasks for build/check/test, one committed bun.lock, strict TypeScript and shared formatting/lint rules. Pin compatible Bun and Node versions in the repo and CI. Scaffold an Astro static site in apps/web, add its official React integration, and enable HTML output per route. Keep the starting app small enough to verify a clean build before adding content.
 3. Create packages/core (pure TypeScript), packages/lab-schema (Zod and shared contracts), packages/lab-content (reviewed YAML, Markdown, fixtures), packages/ui (presentational React and CSS). Keep pages, data loading and persistence in apps/web. Core consumes contract types, content validates against schema, the app composes all four. UI receives data and events as props. CI rejects server-only imports in browser packages.
 4. Give root package scripts stable meanings. Use bun run dev for Astro, lint for all workspaces, typecheck for TypeScript plus Astro templates, validate:labs for the catalog checks below, test for Vitest, build for the validated Astro distribution, and test:e2e for Playwright against the built site. Put Playwright browsers in the development/CI setup. Document prerequisites and the localhost URL printed by dev.
-5. On pull requests, install from the frozen lockfile and run the checks in Phase 5. Protect main with required checks and review. CI uses read-only repository permissions for testing. Keep deployment credentials out of PR jobs. Gate this phase on a fresh checkout producing apps/web/dist/index.html and a real 404.html.
+5. Run the Phase 5 checks locally on the integrated phase branch before opening its Forgejo PR into main. After merge, the VPS mirrors main to GitHub and the push triggers read-only CI. Record the merged SHA and matching GitHub run. Gate this phase on a fresh checkout producing apps/web/dist/index.html and a real 404.html.
 
 ### Work allocation
 
