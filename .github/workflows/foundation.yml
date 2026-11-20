@@ -2,12 +2,12 @@ name: SecureLab CI
 on:
   push:
     branches: [main]
-  pull_request:
 permissions:
   contents: read
 jobs:
   foundation:
     name: foundation
+    if: github.server_url == 'https://github.com'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
