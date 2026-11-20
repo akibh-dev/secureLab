@@ -13,6 +13,10 @@ Use this directory to build the six-lab v0.1 release from an empty repository, d
 | [6 · Cloudflare release](06-cloudflare-release.md) | Verified HTTPS subdomain, deployment record and rollback drill | Requires the real hostname and access to Pages and DNS |
 | [7 · Operations](07-operations.md) | Maintenance cadence, incident ownership and post-MVP backlog | Starts when the public release has an identified maintainer |
 
+## Deliver a phase
+
+Follow the [repository agent instructions](../agents.md) for every phase. Make small commits on a phase branch, run the full local checks, and submit one phase-end PR to Forgejo main. After merge, match the Forgejo main SHA to the GitHub mirror and its push-triggered CI run. Include the PR and run links in the handoff.
+
 ## Assign and integrate work
 
 1. The lead claims the next dependency-ready ticket and records its owner, base commit and write area. A solo implementer uses the same queue in dependency order.

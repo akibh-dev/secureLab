@@ -29,6 +29,6 @@ The browser test starts the built site's preview server. For local machines with
 
 ## Handoff
 
-Design and engine contributors start from the same foundation commit on main. Record `git rev-parse HEAD` when claiming a ticket. Design owns packages/ui and the brand assets. Engine owns packages/core and packages/lab-schema. Catalog tests illustrate the shared summary contract. The CI job named foundation runs for pushes to main and pull requests.
+Design and engine contributors start from the same foundation commit on main. Record `git rev-parse HEAD` when claiming a ticket. Design owns packages/ui and the brand assets. Engine owns packages/core and packages/lab-schema. Catalog tests illustrate the shared summary contract. Open one phase-end PR to main on Forgejo. The foundation CI job runs on GitHub after the mirror pushes main. See the [agent workflow](agents.md).
 
 [Delivery plan](plan/README.md) · [Foundation decision](docs/decisions/0001-static-foundation.md) · [Design assignment](plan/01-design-system.md) · [Engine assignment](plan/02-schema-and-engine.md)
