@@ -27,6 +27,7 @@
         "astro": "^6",
         "react": "^19",
         "react-dom": "^19",
+        "zod": "^4",
       },
       "devDependencies": {
         "@astrojs/check": "^0.9",

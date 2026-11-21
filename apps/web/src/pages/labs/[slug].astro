@@ -1,0 +1,36 @@
+---
+import { publishedLabs } from "@securelab/lab-content";
+import type { Lab } from "@securelab/lab-schema";
+import Workspace from "../../features/lab/Workspace";
+import Page from "../../layouts/Page.astro";
+
+export function getStaticPaths() {
+  return publishedLabs.map((lab) => ({
+    params: { slug: lab.slug },
+    props: { lab },
+  }));
+}
+interface Props {
+  lab: Lab;
+}
+const { lab } = Astro.props;
+const catalog = publishedLabs.map(({ id, slug, title, prerequisites }) => ({
+  id,
+  slug,
+  title,
+  prerequisites,
+}));
+---
+
+<Page title={lab.title + " · SecureLab"} description={lab.objective}>
+  <p class="muted">
+    <a href="/labs/">Labs</a> / {lab.id} · {lab.difficulty} · {lab.minutes} min
+  </p>
+  <h1>{lab.title}</h1>
+  <noscript
+    ><p>
+      {lab.objective} Enable JavaScript to run the local assessment.
+    </p></noscript
+  >
+  <Workspace client:load {lab} {catalog} />
+</Page>

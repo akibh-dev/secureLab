@@ -5,18 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/offline.mjs",
     "typecheck": "astro check"
   },
   "dependencies": {
-    "astro": "^6",
     "@astrojs/react": "^5",
+    "@securelab/core": "workspace:*",
+    "@securelab/lab-content": "workspace:*",
+    "@securelab/lab-schema": "workspace:*",
+    "@securelab/ui": "workspace:*",
+    "astro": "^6",
     "react": "^19",
     "react-dom": "^19",
-    "@securelab/core": "workspace:*",
-    "@securelab/lab-schema": "workspace:*",
-    "@securelab/lab-content": "workspace:*",
-    "@securelab/ui": "workspace:*"
+    "zod": "^4"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9",
