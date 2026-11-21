@@ -9,6 +9,8 @@ test("home and missing-page recovery work in the static build", async ({
   ).toBeVisible();
   await page.getByRole("link", { name: "Return to SecureLab" }).click();
   await expect(
-    page.getByRole("heading", { name: "Interactive API Security Academy" }),
+    page.getByRole("heading", {
+      name: "Learn to build APIs that enforce the rules.",
+    }),
   ).toBeVisible();
 });

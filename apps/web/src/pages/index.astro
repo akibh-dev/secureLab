@@ -3,10 +3,42 @@ import Page from "../layouts/Page.astro";
 ---
 
 <Page title="SecureLab · Interactive API Security Academy">
-  <p>SecureLab</p>
-  <h1>Interactive API Security Academy</h1>
-  <p>
-    Practice making access decisions for fictional APIs and learn how to verify
-    them. The first six lessons are in development.
-  </p>
+  <section class="hero">
+    <div>
+      <p class="label">Interactive API Security Academy</p>
+      <h1>Learn to build APIs that enforce the rules.</h1>
+      <p class="muted">
+        Work through fictional API scenarios. Choose a defensive policy, run its
+        checks, and see why each decision passes or fails.
+      </p>
+      <slot name="start" />
+    </div>
+    <div class="panel">
+      <p class="label">Sample policy check</p>
+      <h2>Project membership</h2>
+      <pre>Actor&nbsp;&nbsp; Verified project member
+Rule&nbsp;&nbsp;&nbsp; Require project membership
+Result&nbsp; Allow access</pre>
+      <p class="pass">✓ Pass · Membership confirmed</p>
+    </div>
+  </section>
 </Page>
+<style>
+  .hero {
+    display: grid;
+    align-items: center;
+    gap: clamp(1.5rem, 5vw, 5rem);
+  }
+  @media (min-width: 800px) {
+    .hero {
+      grid-template-columns: 1.2fr 1fr;
+    }
+  }
+  h1 {
+    margin: 0.5rem 0 1rem;
+  }
+  .label {
+    color: var(--accent);
+    font: 0.875rem/1.5 var(--mono);
+  }
+</style>
