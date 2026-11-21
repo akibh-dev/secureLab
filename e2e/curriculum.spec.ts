@@ -100,3 +100,94 @@ test("export, validate, cancel and restore browser progress", async ({
     .click();
   await expect(page.getByText("0 of 6 labs complete")).toBeVisible();
 });
+
+test("production policy allows hydration with a same-origin connection rule", async ({
+  page,
+}) => {
+  const violations: string[] = [];
+  page.on("console", (message) => {
+    if (
+      message.type() === "error" &&
+      message.text().includes("Content Security Policy")
+    ) {
+      violations.push(message.text());
+    }
+  });
+  const response = await page.goto(
+    "/labs/authentication-is-not-authorization/",
+  );
+  const policy = response?.headers()["content-security-policy"];
+  expect(policy).toContain("connect-src 'self'");
+  expect(policy).toContain("script-src 'self' 'sha256-");
+  await expect(
+    page.getByRole("radio", { name: /Require verified project membership/ }),
+  ).toBeVisible();
+  await expect(page.getByText("Available offline")).toBeVisible();
+  expect(violations).toEqual([]);
+});
+
+test("when persistent storage is blocked the learner can still run the lab", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "indexedDB", {
+      get() {
+        throw new DOMException("Storage blocked", "SecurityError");
+      },
+    });
+  });
+  await page.goto("/labs/authentication-is-not-authorization/");
+  await expect(
+    page.getByText("Progress is saved for this session only."),
+  ).toBeVisible();
+  await page
+    .getByRole("radio", { name: /Require verified project membership/ })
+    .check();
+  await page.getByRole("button", { name: "Run tests" }).click();
+  await expect(
+    page.getByText("4 of 4 tests passed. Lab complete."),
+  ).toBeVisible();
+});
+
+test("keeps the curriculum, progress and lab usable at 320px", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  for (const path of [
+    "/",
+    "/learn/",
+    "/progress/",
+    "/labs/authentication-is-not-authorization/",
+  ]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(320);
+  }
+  await page.getByRole("tab", { name: "Fix" }).click();
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(320);
+});
+
+test("serializes attempts from two tabs", async ({ page, context }) => {
+  const other = await context.newPage();
+  const url = "/labs/authentication-is-not-authorization/";
+  await page.goto(url);
+  await page
+    .getByRole("radio", { name: /Require verified project membership/ })
+    .check();
+  await expect(page.getByRole("button", { name: "Run tests" })).toBeEnabled();
+  await other.goto(url);
+  await expect(
+    other.getByRole("radio", { name: /Require verified project membership/ }),
+  ).toBeChecked();
+  await Promise.all(
+    [page, other].map((tab) =>
+      tab.getByRole("button", { name: "Run tests" }).click(),
+    ),
+  );
+  await expect(page.getByText(/2 attempts/)).toBeVisible();
+  await expect(other.getByText(/2 attempts/)).toBeVisible();
+});

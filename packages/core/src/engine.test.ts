@@ -1,5 +1,7 @@
 import { expect, it } from "vitest";
-import { pilot } from "../../lab-content/src/pilot";
+import { publishedLabs } from "../../lab-content/src/index";
+
+const pilot = publishedLabs[0];
 import { labSchema } from "@securelab/lab-schema";
 import { runLab, solutionFor } from "./index";
 

@@ -1,5 +1,4 @@
-import type { Lab } from "@securelab/lab-schema";
-import { pilot } from "./pilot";
-import { curriculum } from "./curriculum";
+import { labSchema, type Lab } from "@securelab/lab-schema";
+import catalog from "./catalog.generated.json" with { type: "json" };
 
-export const publishedLabs: readonly Lab[] = [pilot, ...curriculum];
+export const publishedLabs: readonly Lab[] = labSchema.array().parse(catalog);

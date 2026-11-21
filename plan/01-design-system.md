@@ -10,10 +10,12 @@
 
 | Ticket | Action | Acceptance evidence |
 |---|---|---|
-| [ ] D1 | Draw, export and inspect the identity assets | Mark remains recognizable at 16 px; wordmark, favicon, touch icon and social preview are present. |
-| [ ] D2 | Implement tokens, icons and controls | Contrast measurements and focus examples cover normal, selected, disabled and feedback states. |
-| [ ] D3 | Compose responsive screens with fixture data | Captures show the catalog, progress and lab at phone and desktop widths, including failed and completed states. |
-| [ ] D4 | Walk through the prototype using only the keyboard | A reviewer can reach a hint, dismiss it, run tests and inspect results. Hand off component props and state examples to W and N. |
+| [x] D1 | Draw, export and inspect the identity assets | Mark remains recognizable at 16 px; wordmark, favicon, touch icon and social preview are present. |
+| [x] D2 | Implement tokens, icons and controls | Contrast measurements and focus examples cover normal, selected, disabled and feedback states. |
+| [x] D3 | Compose responsive screens with fixture data | Captures show the catalog, progress and lab at phone and desktop widths, including failed and completed states. |
+| [x] D4 | Walk through the prototype using only the keyboard | A reviewer can reach a hint, dismiss it, run tests and inspect results. Hand off component props and state examples to W and N. |
+
+Local test evidence is recorded in the [release handoff](../docs/RELEASE.md).
 
 ## Implementation details
 

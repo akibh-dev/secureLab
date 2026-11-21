@@ -9,12 +9,12 @@
     "typecheck": "astro check"
   },
   "dependencies": {
-    "@astrojs/react": "^5",
+    "@astrojs/react": "^7.1.9",
     "@securelab/core": "workspace:*",
     "@securelab/lab-content": "workspace:*",
     "@securelab/lab-schema": "workspace:*",
     "@securelab/ui": "workspace:*",
-    "astro": "^6",
+    "astro": "^7.4.13",
     "react": "^19",
     "react-dom": "^19",
     "zod": "^4"

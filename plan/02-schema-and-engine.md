@@ -10,11 +10,13 @@
 
 | Ticket | Action | Acceptance evidence |
 |---|---|---|
-| [ ] E1 | Publish the schema and sample input/output | L1 can author a lab; W can render a result; P knows exactly which identifiers to persist. |
-| [ ] E2 | Build catalog and reference validation | Invalid fixture files report stable, actionable diagnostics. |
-| [ ] E3 | Implement evaluation and result tracing | Run the same fixture twice and compare serialized results. Inputs remain identical after both runs. |
-| [ ] E4 | Verify scoring and completion independently | A required assertion failure blocks completion even with a high score. Hints have zero effect on correctness. |
-| [ ] E5 | Freeze the contract | Tag the contract version in the handoff and provide one passing and one failing result for UI tests. |
+| [x] E1 | Publish the schema and sample input/output | L1 can author a lab; W can render a result; P knows exactly which identifiers to persist. |
+| [x] E2 | Build catalog and reference validation | Invalid fixture files report stable, actionable diagnostics. |
+| [x] E3 | Implement evaluation and result tracing | Run the same fixture twice and compare serialized results. Inputs remain identical after both runs. |
+| [x] E4 | Verify scoring and completion independently | A required assertion failure blocks completion even with a high score. Hints have zero effect on correctness. |
+| [x] E5 | Freeze the contract | Tag the contract version in the handoff and provide one passing and one failing result for UI tests. |
+
+Local test evidence is recorded in the [release handoff](../docs/RELEASE.md).
 
 ## Implementation details
 

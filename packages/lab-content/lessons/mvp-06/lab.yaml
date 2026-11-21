@@ -1,0 +1,174 @@
+id: MVP-06
+slug: least-privilege-capstone
+title: Least-Privilege Capstone
+module: capstones
+objective: Apply the minimum permissions for each document action.
+version: 1
+minutes: 25
+difficulty: Advanced
+prerequisites:
+  - MVP-05
+invariants:
+  rule: Apply the minimum permissions for each document action.
+references:
+  - label: OWASP API Security Top 10 (2023) · API1 / API5
+    url: https://owasp.org/API-Security/editions/2023/en/0x11-t10/
+mode: policy-editor
+routes:
+  - GET /api/workspaces/:id/docs
+  - PATCH /api/docs/:id
+  - POST /api/docs/:id/share
+rules:
+  - action: list
+    solution: scoped-list
+    options:
+      - id: scoped-list
+        label: List within the verified tenant with list permission
+        checks:
+          - tenant
+          - permission
+        effect: access
+      - id: owner-list
+        label: Require ownership to list
+        checks:
+          - tenant
+          - permission
+          - owner
+        effect: access
+  - action: edit
+    solution: scoped-edit
+    options:
+      - id: scoped-edit
+        label: Require edit permission in the verified tenant
+        checks:
+          - tenant
+          - permission
+        effect: update
+      - id: owner-edit
+        label: Require ownership for every edit
+        checks:
+          - tenant
+          - permission
+          - owner
+        effect: update
+  - action: share
+    solution: scoped-share
+    options:
+      - id: scoped-share
+        label: Require share permission in the verified tenant
+        checks:
+          - tenant
+          - permission
+        effect: update
+      - id: owner-share
+        label: Require ownership for every share
+        checks:
+          - tenant
+          - permission
+          - owner
+        effect: update
+cases:
+  - id: list
+    label: A verified member can list workspace documents
+    invariant: rule
+    action: list
+    fixture:
+      actor: &a3
+        id: reader-a
+        tenant: north
+        permissions:
+          - read
+          - list
+      resource: &a1
+        tenant: north
+        owner: owner-a
+        members:
+          - reader-a
+          - owner-a
+        visibility: team
+        open: true
+    expected:
+      outcome: allowed
+    group: behavior
+    weight: 1
+  - id: edit
+    label: An editor may edit the document
+    invariant: rule
+    action: edit
+    fixture:
+      actor:
+        id: editor-a
+        tenant: north
+        permissions: &a2
+          - close
+          - edit
+          - share
+      resource: *a1
+    expected:
+      outcome: allowed
+      state: edited
+    group: behavior
+    weight: 1
+  - id: share
+    label: A delegated teammate may share the document
+    invariant: rule
+    action: share
+    fixture:
+      actor:
+        id: editor-a
+        tenant: north
+        permissions: *a2
+      resource: *a1
+    expected:
+      outcome: allowed
+      state: shared
+    group: behavior
+    weight: 1
+  - id: denied-share
+    label: A reader cannot share
+    invariant: rule
+    action: share
+    fixture:
+      actor: *a3
+      resource: *a1
+    expected: &a4
+      outcome: restricted
+    group: boundary
+    weight: 1
+  - id: foreign-edit
+    label: An out-of-scope editor cannot edit
+    invariant: rule
+    action: edit
+    fixture:
+      actor:
+        id: owner-a
+        tenant: south
+        permissions: *a2
+      resource: *a1
+    expected: *a4
+    group: boundary
+    weight: 1
+  - id: other-action
+    label: An action outside the policy matrix is restricted
+    invariant: rule
+    action: close
+    fixture:
+      actor:
+        id: owner-a
+        tenant: north
+        permissions: *a2
+      resource: *a1
+    expected: *a4
+    group: boundary
+    weight: 1
+hints:
+  - Check how each operation changes or reveals data.
+  - Give every action a separate permission in the verified workspace.
+  - Use the tenant boundary and exact action permission for every supported
+    operation.
+correctReason: principle
+reasoning:
+  - id: principle
+    label: Each operation has an explicit permission inside the workspace boundary.
+  - id: alternate
+    label: Ownership is required for every operation.

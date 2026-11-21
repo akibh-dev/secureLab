@@ -11,9 +11,11 @@
 | Ticket | Action | Acceptance evidence |
 |---|---|---|
 | [ ] L2–L6 | Assign the five remaining packs independently | Each pack has a human content review, three hint tiers and successful good-policy and distractor checks. |
-| [ ] N1 | Generate the curriculum, catalog and progress routes | All six slugs resolve; direct links and prerequisite labels agree with the shared manifest. |
-| [ ] N2 | Finish public pages, glossary and metadata | Landing, contribution, accessibility and privacy links work on small screens. |
-| [ ] I1 | Integrate packs in prerequisite order | Complete all six, confirm the capstone summary and reopen a completed lesson. Rebuild the offline manifest against the full catalog. |
+| [x] N1 | Generate the curriculum, catalog and progress routes | All six slugs resolve; direct links and prerequisite labels agree with the shared manifest. |
+| [x] N2 | Finish public pages, glossary and metadata | Landing, contribution, accessibility and privacy links work on small screens. |
+| [x] I1 | Integrate packs in prerequisite order | Complete all six, confirm the capstone summary and reopen a completed lesson. Rebuild the offline manifest against the full catalog. |
+
+Local test evidence is recorded in the [release handoff](../docs/RELEASE.md).
 
 ## Implementation details
 

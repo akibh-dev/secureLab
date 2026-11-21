@@ -1,0 +1,100 @@
+id: MVP-01
+slug: authentication-is-not-authorization
+title: Authentication Is Not Authorization
+module: foundations
+objective: Return a project only to a verified project member.
+version: 1
+minutes: 12
+difficulty: Beginner
+prerequisites: []
+invariants:
+  rule: Return a project only to a verified project member.
+references:
+  - label: OWASP API Security Top 10 (2023) · API1
+    url: https://owasp.org/API-Security/editions/2023/en/0x11-t10/
+mode: choose-fix
+routes:
+  - GET /api/projects/:projectId
+options:
+  - id: owners-only
+    label: Require the project owner
+    checks:
+      - signed-in
+      - owner
+    effect: access
+  - id: members
+    label: Require verified project membership
+    checks:
+      - signed-in
+      - member
+    effect: access
+solution: members
+cases:
+  - id: member
+    label: A verified member can read the project
+    invariant: rule
+    action: read
+    fixture:
+      actor: &a2
+        id: reader-a
+        tenant: north
+        permissions:
+          - read
+          - list
+      resource: &a1
+        tenant: north
+        owner: owner-a
+        members:
+          - reader-a
+          - owner-a
+        visibility: team
+        open: true
+    expected:
+      outcome: allowed
+    group: behavior
+    weight: 1
+  - id: nonmember
+    label: An unrelated account receives a restricted result
+    invariant: rule
+    action: read
+    fixture:
+      actor:
+        id: reader-b
+        tenant: south
+        permissions:
+          - read
+      resource: *a1
+    expected: &a3
+      outcome: restricted
+    group: boundary
+    weight: 1
+  - id: missing
+    label: An unavailable project returns the same public result
+    invariant: rule
+    action: read
+    fixture:
+      actor: *a2
+      resource: null
+    expected: *a3
+    group: boundary
+    weight: 1
+  - id: anonymous
+    label: An unverified identity cannot read
+    invariant: rule
+    action: read
+    fixture:
+      actor: null
+      resource: *a1
+    expected: *a3
+    group: boundary
+    weight: 1
+hints:
+  - Think about the relationship between the verified actor and this project.
+  - Check membership after establishing the actor's identity.
+  - Require the verified actor's ID to appear in the project's member list.
+reasoning:
+  - id: relationship
+    label: Authorization depends on the actor's relationship to this project.
+  - id: ownership
+    label: Ownership is the only relationship that can grant read access.
+correctReason: relationship

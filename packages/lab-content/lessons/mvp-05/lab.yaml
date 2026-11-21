@@ -1,0 +1,129 @@
+id: MVP-05
+slug: validate-inputs-and-limit-work
+title: Validate Inputs and Limit Work
+module: resource-protection
+objective: Validate pagination before accessing records.
+version: 1
+minutes: 12
+difficulty: Intermediate
+prerequisites:
+  - MVP-04
+invariants:
+  rule: Validate pagination before accessing records.
+references:
+  - label: OWASP API Security Top 10 (2023) · API4
+    url: https://owasp.org/API-Security/editions/2023/en/0x11-t10/
+mode: choose-fix
+routes:
+  - GET /api/items?page=…&pageSize=…
+options:
+  - id: permission-first
+    label: Require a catalog permission before validation
+    checks:
+      - permission
+      - valid-page
+    effect: page
+  - id: bounded
+    label: Validate bounded pagination for signed-in viewers
+    checks:
+      - signed-in
+      - valid-page
+    effect: page
+solution: bounded
+cases:
+  - id: defaults
+    label: Omitted values use documented defaults
+    invariant: rule
+    action: list
+    fixture:
+      actor:
+        id: owner-a
+        tenant: north
+        permissions: &a1
+          - read
+          - list
+      resource: null
+    expected:
+      outcome: allowed
+      page: 1
+      size: 20
+    group: behavior
+    weight: 1
+  - id: edge
+    label: Maximum accepted values are handled
+    invariant: rule
+    action: list
+    fixture:
+      actor: &a2
+        id: reader-a
+        tenant: north
+        permissions: *a1
+      resource: null
+      page: "1000"
+      size: "50"
+    expected:
+      outcome: allowed
+      page: 1000
+      size: 50
+    group: boundary
+    weight: 1
+  - id: bad-size
+    label: An out-of-range value performs no reads
+    invariant: rule
+    action: list
+    fixture:
+      actor: *a2
+      resource: null
+      size: "51"
+    expected: &a3
+      outcome: invalid-input
+      reads: 0
+    group: boundary
+    weight: 1
+  - id: malformed
+    label: Non-integer input performs no reads
+    invariant: rule
+    action: list
+    fixture:
+      actor: *a2
+      resource: null
+      page: "1.2"
+    expected: *a3
+    group: boundary
+    weight: 1
+  - id: duplicate
+    label: An ambiguous input performs no reads
+    invariant: rule
+    action: list
+    fixture:
+      actor: *a2
+      resource: null
+      size: 20,30
+    expected: *a3
+    group: boundary
+    weight: 1
+  - id: signed-in
+    label: Signed-in catalog viewers can list
+    invariant: rule
+    action: list
+    fixture:
+      actor:
+        id: catalog-reader
+        permissions: []
+      resource: null
+    expected:
+      outcome: allowed
+      page: 1
+      size: 20
+    group: behavior
+    weight: 1
+hints:
+  - Work out the input contract before deciding how to fetch.
+  - Distinguish omitted values from malformed or ambiguous input.
+  - Reject input outside page 1–1000 and size 1–50 before reading data.
+correctReason: principle
+reasoning:
+  - id: principle
+    label: Early bounds make the requested work predictable.
+  - id: alternate
+    label: A permission check alone controls the amount of work.

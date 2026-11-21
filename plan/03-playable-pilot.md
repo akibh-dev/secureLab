@@ -10,11 +10,13 @@
 
 | Ticket | Action | Acceptance evidence |
 |---|---|---|
-| [ ] L1 | Write the MVP-01 authoring example | Reviewed fixtures cover membership, missing context and restricted response consistency. |
-| [ ] P1 | Implement versioned progress and import/export | Round trip an export, cancel a replacement and exercise simultaneous saves. |
-| [ ] W1 | Connect brief, choices, hints, results and explanation | One learner can fail, correct, complete and explicitly continue. |
-| [ ] W2 | Integrate restore and offline behavior | Reload preserves the draft; the pilot works after disconnecting. Generate the manifest from published labs so it expands in Phase 4. |
-| [ ] W3 | Accept the vertical slice | Capture the pilot journey and verify the MVP-02 unlock condition with catalog metadata. Real navigation to playable MVP-02 is verified in Phase 4. |
+| [x] L1 | Write the MVP-01 authoring example | Reviewed fixtures cover membership, missing context and restricted response consistency. |
+| [x] P1 | Implement versioned progress and import/export | Round trip an export, cancel a replacement and exercise simultaneous saves. |
+| [x] W1 | Connect brief, choices, hints, results and explanation | One learner can fail, correct, complete and explicitly continue. |
+| [x] W2 | Integrate restore and offline behavior | Reload preserves the draft; the pilot works after disconnecting. Generate the manifest from published labs so it expands in Phase 4. |
+| [x] W3 | Accept the vertical slice | Capture the pilot journey and verify the MVP-02 unlock condition with catalog metadata. Real navigation to playable MVP-02 is verified in Phase 4. |
+
+Local test evidence is recorded in the [release handoff](../docs/RELEASE.md).
 
 ## Implementation details
 
