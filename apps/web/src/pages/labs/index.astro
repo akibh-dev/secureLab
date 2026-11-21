@@ -1,0 +1,14 @@
+---
+import Page from "../../layouts/Page.astro";
+import { LabCards } from "../../features/progress/ProgressPanel";
+import { cards } from "../../features/progress/cards";
+---
+
+<Page title="Labs · SecureLab">
+  <h1>Labs</h1>
+  <p>
+    Practice API access decisions with fictional data. Complete each lab to
+    unlock the next.
+  </p>
+  <LabCards client:load labs={cards} />
+</Page>

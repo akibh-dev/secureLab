@@ -1,0 +1,69 @@
+.workspace {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 25fr) minmax(0, 40fr) minmax(0, 35fr);
+  align-items: start;
+}
+.results {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+.choice {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  padding: 0.65rem;
+  cursor: pointer;
+}
+.choice small {
+  display: block;
+  color: var(--muted);
+}
+fieldset {
+  border: 1px solid var(--line);
+  min-width: 0;
+  margin: 0 0 1rem;
+}
+.reason {
+  display: grid;
+  gap: 0.5rem;
+}
+.reason select {
+  width: 100%;
+  min-width: 0;
+}
+[role="tabpanel"] {
+  margin-top: 0.75rem;
+}
+details {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #343d46;
+}
+summary {
+  cursor: pointer;
+}
+.workspace-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--background);
+  padding: 0.75rem 0 max(0.75rem, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+}
+.workspace-actions svg {
+  vertical-align: middle;
+}
+dialog {
+  max-width: min(38rem, calc(100% - 2rem));
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.7);
+}
+dialog button {
+  margin-bottom: 0.35rem;
+}

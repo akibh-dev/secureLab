@@ -46,7 +46,10 @@ const canonical = Astro.site && new URL(Astro.url.pathname, Astro.site);
       </div>
     </header>
     <main id="content"><slot /></main>
-    <footer><slot name="footer" /></footer>
+    <footer>
+      <slot name="footer" />
+      <small class="muted" id="offline-status" role="status"></small>
+    </footer>
   </body>
 </html>
 <style>
@@ -84,3 +87,29 @@ const canonical = Astro.site && new URL(Astro.url.pathname, Astro.site);
     padding-block: 1.5rem;
   }
 </style>
+
+<script>
+  if (import.meta.env.PROD && "serviceWorker" in navigator) {
+    const status = document.getElementById("offline-status");
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (status) status.textContent = "Available offline";
+    });
+    void navigator.serviceWorker
+      .register("/sw.js")
+      .then(async (registration) => {
+        if (registration.waiting && status)
+          status.textContent =
+            "Close other SecureLab tabs to finish the update.";
+        await navigator.serviceWorker.ready;
+        if (
+          navigator.serviceWorker.controller &&
+          status &&
+          !registration.waiting
+        )
+          status.textContent = "Available offline";
+      })
+      .catch(() => {
+        if (status) status.textContent = "Offline setup unavailable";
+      });
+  }
+</script>
