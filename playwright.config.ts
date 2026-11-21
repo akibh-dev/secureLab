@@ -8,8 +8,7 @@ export default defineConfig({
     launchOptions: { executablePath: process.env.CHROMIUM_PATH },
   },
   webServer: {
-    command:
-      "bun run --cwd apps/web astro preview --host 127.0.0.1 --port 4322",
+    command: "bun apps/web/scripts/preview.mjs",
     url: baseURL,
   },
 });
