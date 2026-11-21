@@ -1,0 +1,125 @@
+:root {
+  color-scheme: dark;
+  --background: #0c0e11;
+  --surface: #15191e;
+  --raised: #20262c;
+  --ink: #eef2f4;
+  --muted: #a6b0ba;
+  --line: #687683;
+  --accent: #8bd7b4;
+  --warning: #e8be75;
+  --danger: #e59a9a;
+  --radius: 12px;
+  --mono: ui-monospace, SFMono-Regular, monospace;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--ink);
+  font:
+    100%/1.55 system-ui,
+    sans-serif;
+}
+a {
+  color: var(--accent);
+}
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+h1,
+h2,
+h3 {
+  line-height: 1.17;
+}
+h1 {
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  letter-spacing: -0.045em;
+}
+p {
+  max-width: 70ch;
+}
+pre {
+  overflow: auto;
+  padding: 1rem;
+  background: var(--background);
+  border-radius: 6px;
+  font: 0.875rem/1.6 var(--mono);
+}
+button,
+select,
+.button {
+  font: inherit;
+  min-height: 44px;
+  color: var(--ink);
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.45rem 0.85rem;
+}
+button,
+.button {
+  cursor: pointer;
+}
+.button {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.primary {
+  background: var(--accent);
+  color: #101916;
+  border-color: var(--accent);
+  font-weight: 650;
+}
+button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+.panel {
+  background: var(--surface);
+  border: 1px solid #343d46;
+  border-radius: var(--radius);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  min-width: 0;
+}
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+.muted {
+  color: var(--muted);
+}
+.pass {
+  color: var(--accent);
+}
+.fail {
+  color: var(--danger);
+}
+.caution {
+  color: var(--warning);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+.skip {
+  position: absolute;
+  transform: translateY(-200%);
+  background: var(--surface);
+  padding: 0.75rem;
+  z-index: 5;
+}
+.skip:focus {
+  transform: translateY(0);
+}
+[role="tab"][aria-selected="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
