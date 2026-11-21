@@ -3,6 +3,7 @@ import type { LabCard } from "./ProgressPanel";
 
 export const cards: LabCard[] = publishedLabs.map(
   ({
+    module,
     id,
     slug,
     title,
@@ -12,6 +13,7 @@ export const cards: LabCard[] = publishedLabs.map(
     minutes,
     objective,
   }) => ({
+    module,
     id,
     slug,
     title,

@@ -11,7 +11,13 @@ import Page from "../layouts/Page.astro";
         Work through fictional API scenarios. Choose a defensive policy, run its
         checks, and see why each decision passes or fails.
       </p>
-      <slot name="start" />
+      <div class="actions">
+        <a
+          class="button primary"
+          href="/labs/authentication-is-not-authorization/">Start learning</a
+        >
+        <a class="button" href="/progress/">Resume learning</a>
+      </div>
     </div>
     <div class="panel">
       <p class="label">Sample policy check</p>
@@ -22,8 +28,32 @@ Result&nbsp; Allow access</pre>
       <p class="pass">✓ Pass · Membership confirmed</p>
     </div>
   </section>
+  <section class="overview">
+    <h2>What you’ll practice</h2>
+    <div class="grid">
+      <article class="panel">
+        <h3>Authorization</h3><p>
+          Grant access according to the verified actor and requested action.
+        </p>
+      </article>
+      <article class="panel">
+        <h3>Tenant isolation</h3><p>
+          Keep a workspace’s data inside its verified tenant boundary.
+        </p>
+      </article>
+      <article class="panel">
+        <h3>Input validation</h3><p>
+          Reject invalid inputs before doing unnecessary work.
+        </p>
+      </article>
+    </div>
+    <p><a href="/learn/">Explore the curriculum</a></p>
+  </section>
 </Page>
 <style>
+  .overview {
+    margin-top: clamp(2rem, 7vw, 5rem);
+  }
   .hero {
     display: grid;
     align-items: center;

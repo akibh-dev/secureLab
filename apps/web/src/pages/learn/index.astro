@@ -1,0 +1,31 @@
+---
+import Page from "../../layouts/Page.astro";
+import { modules } from "../../features/progress/modules";
+import { cards } from "../../features/progress/cards";
+---
+
+<Page title="Curriculum · SecureLab">
+  <h1>Curriculum</h1>
+  <p>
+    Begin with the foundations and work toward a workspace policy that covers
+    multiple operations.
+  </p>
+  <div class="grid">
+    {
+      modules.map((module) => {
+        const count = cards.filter((lab) => lab.module === module.slug).length;
+        return (
+          <article class="panel">
+            <p class="muted">
+              {count ? `${count} lab${count === 1 ? "" : "s"}` : "Planned"}
+            </p>
+            <h2>
+              <a href={`/learn/${module.slug}/`}>{module.title}</a>
+            </h2>
+            <p>{module.description}</p>
+          </article>
+        );
+      })
+    }
+  </div>
+</Page>

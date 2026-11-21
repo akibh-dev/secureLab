@@ -5,6 +5,7 @@ import { useProgress } from "./useProgress";
 
 export type LabCard = Pick<
   Lab,
+  | "module"
   | "id"
   | "slug"
   | "title"
