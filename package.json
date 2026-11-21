@@ -15,9 +15,10 @@
     "lint": "eslint . && prettier --check .",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "validate:labs": "bun scripts/validate-labs.ts",
+    "validate:labs": "bun scripts/compile-labs.ts --check && bun scripts/validate-labs.ts",
     "build": "bun run validate:labs && turbo run build",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "compile:labs": "bun scripts/compile-labs.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
@@ -28,6 +29,7 @@
     "turbo": "^2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8",
-    "vitest": "^4"
+    "vitest": "^4",
+    "yaml": "^2.9.1"
   }
 }

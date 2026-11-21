@@ -1,0 +1,118 @@
+id: MVP-03
+slug: role-vs-permission
+title: Role vs Permission
+module: authorization
+objective: Require close permission, matching scope and an open ticket.
+version: 1
+minutes: 12
+difficulty: Intermediate
+prerequisites:
+  - MVP-02
+invariants:
+  rule: Require close permission, matching scope and an open ticket.
+references:
+  - label: OWASP API Security Top 10 (2023) · API5
+    url: https://owasp.org/API-Security/editions/2023/en/0x11-t10/
+mode: choose-fix
+routes:
+  - POST /api/tickets/:ticketId/close
+options:
+  - id: permitted
+    label: Require permission, tenant scope and open state
+    checks:
+      - tenant
+      - permission
+      - open
+    effect: update
+  - id: assigned
+    label: Additionally require personal ownership
+    checks:
+      - tenant
+      - permission
+      - open
+      - owner
+    effect: update
+solution: permitted
+cases:
+  - id: close
+    label: A scoped supervisor closes an open ticket
+    invariant: rule
+    action: close
+    fixture:
+      actor:
+        id: supervisor-a
+        tenant: north
+        permissions: &a2
+          - close
+          - edit
+          - share
+      resource: &a1
+        tenant: north
+        owner: owner-a
+        members: &a4
+          - reader-a
+          - owner-a
+        visibility: team
+        open: true
+    expected:
+      outcome: allowed
+      state: closed
+    group: behavior
+    weight: 1
+  - id: no-permission
+    label: A reader cannot close a ticket
+    invariant: rule
+    action: close
+    fixture:
+      actor:
+        id: reader-a
+        tenant: north
+        permissions:
+          - read
+          - list
+      resource: *a1
+    expected: &a3
+      outcome: restricted
+    group: boundary
+    weight: 1
+  - id: other-scope
+    label: An out-of-scope supervisor cannot close
+    invariant: rule
+    action: close
+    fixture:
+      actor:
+        id: owner-a
+        tenant: south
+        permissions: *a2
+      resource: *a1
+    expected: *a3
+    group: boundary
+    weight: 1
+  - id: closed
+    label: A previously closed ticket stays closed
+    invariant: rule
+    action: close
+    fixture:
+      actor:
+        id: owner-a
+        tenant: north
+        permissions: *a2
+      resource:
+        tenant: north
+        owner: owner-a
+        members: *a4
+        visibility: team
+        open: false
+    expected: *a3
+    group: boundary
+    weight: 1
+hints:
+  - A role name describes a group of privileges.
+  - Check action scope and current business state together.
+  - Allow close only when permission, tenant and open state all match.
+correctReason: principle
+reasoning:
+  - id: principle
+    label: The permission applies to the action and tenant where the ticket is open.
+  - id: alternate
+    label: A supervisor must always personally own every ticket they close.

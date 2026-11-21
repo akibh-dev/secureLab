@@ -11,5 +11,6 @@
     "test": {
       "outputs": []
     }
-  }
+  },
+  "globalDependencies": ["packages/lab-content/src/catalog.generated.json"]
 }

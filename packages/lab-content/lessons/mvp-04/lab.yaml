@@ -1,0 +1,106 @@
+id: MVP-04
+slug: property-level-authorization
+title: Property-Level Authorization
+module: authorization
+objective: Return only the approved fields for the authorized audience.
+version: 1
+minutes: 12
+difficulty: Intermediate
+prerequisites:
+  - MVP-03
+invariants:
+  rule: Return only the approved fields for the authorized audience.
+references:
+  - label: OWASP API Security Top 10 (2023) · API3
+    url: https://owasp.org/API-Security/editions/2023/en/0x11-t10/
+mode: choose-fix
+routes:
+  - GET /api/profiles/:id
+options:
+  - id: one-view
+    label: Use the public field list for every viewer
+    checks:
+      - tenant
+      - visible
+    effect: profile
+    profile: public
+  - id: audience
+    label: Project fields by verified audience
+    checks:
+      - tenant
+      - visible
+    effect: profile
+    profile: by-audience
+solution: audience
+cases:
+  - id: team-fields
+    label: A teammate sees display name and bio
+    invariant: rule
+    action: read
+    fixture:
+      actor:
+        id: reader-a
+        tenant: north
+        permissions: &a1
+          - read
+          - list
+      resource: &a2
+        tenant: north
+        owner: owner-a
+        members:
+          - reader-a
+          - owner-a
+        visibility: team
+        open: true
+    expected:
+      outcome: allowed
+      fields:
+        - display-name
+        - bio
+    group: behavior
+    weight: 1
+  - id: self-fields
+    label: The owner also sees their contact preference
+    invariant: rule
+    action: read
+    fixture:
+      actor:
+        id: owner-a
+        tenant: north
+        permissions: *a1
+      resource: *a2
+    expected:
+      outcome: allowed
+      fields:
+        - display-name
+        - bio
+        - contact-preference
+    group: behavior
+    weight: 1
+  - id: denied
+    label: An unapproved viewer receives no profile fields
+    invariant: rule
+    action: read
+    fixture:
+      actor:
+        id: reader-b
+        tenant: south
+        permissions:
+          - read
+      resource: *a2
+    expected:
+      outcome: restricted
+    group: boundary
+    weight: 1
+hints:
+  - A permitted record can have fields with different audiences.
+  - Authorize the record, then build a separate response.
+  - Create a public field list and add contact preference only for the verified
+    owner.
+correctReason: principle
+reasoning:
+  - id: principle
+    label: Object access and visibility of individual properties are separate
+      decisions.
+  - id: alternate
+    label: Every audience needs the same fixed representation.

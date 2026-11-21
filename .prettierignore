@@ -11,3 +11,5 @@ plan/
 .aws/
 .codex/
 .agents/
+
+packages/lab-content/src/catalog.generated.json

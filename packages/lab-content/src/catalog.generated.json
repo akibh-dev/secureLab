@@ -1,0 +1,1279 @@
+[
+  {
+    "id": "MVP-01",
+    "slug": "authentication-is-not-authorization",
+    "title": "Authentication Is Not Authorization",
+    "version": 1,
+    "module": "foundations",
+    "difficulty": "Beginner",
+    "minutes": 12,
+    "prerequisites": [],
+    "objective": "Return a project only to a verified project member.",
+    "scenario": "Fieldnote is a fictional project workspace. Members need to read shared projects. The access policy must check who is in each project and use a consistent response when a project is unavailable.",
+    "routes": [
+      "GET /api/projects/:projectId"
+    ],
+    "invariants": {
+      "rule": "Return a project only to a verified project member."
+    },
+    "hints": [
+      "Think about the relationship between the verified actor and this project.",
+      "Check membership after establishing the actor's identity.",
+      "Require the verified actor's ID to appear in the project's member list."
+    ],
+    "cases": [
+      {
+        "id": "member",
+        "label": "A verified member can read the project",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "allowed"
+        },
+        "group": "behavior",
+        "weight": 1
+      },
+      {
+        "id": "nonmember",
+        "label": "An unrelated account receives a restricted result",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "reader-b",
+            "tenant": "south",
+            "permissions": [
+              "read"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 1
+      },
+      {
+        "id": "missing",
+        "label": "An unavailable project returns the same public result",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": null
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 1
+      },
+      {
+        "id": "anonymous",
+        "label": "An unverified identity cannot read",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": null,
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 1
+      }
+    ],
+    "explanation": "Authentication establishes identity. Project membership grants the read permission in this scenario. The unavailable response reveals no project details.",
+    "references": [
+      {
+        "label": "OWASP API Security Top 10 (2023) · API1",
+        "url": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/"
+      }
+    ],
+    "reasoning": [
+      {
+        "id": "relationship",
+        "label": "Authorization depends on the actor's relationship to this project."
+      },
+      {
+        "id": "ownership",
+        "label": "Ownership is the only relationship that can grant read access."
+      }
+    ],
+    "correctReason": "relationship",
+    "mode": "choose-fix",
+    "options": [
+      {
+        "id": "owners-only",
+        "label": "Require the project owner",
+        "checks": [
+          "signed-in",
+          "owner"
+        ],
+        "effect": "access"
+      },
+      {
+        "id": "members",
+        "label": "Require verified project membership",
+        "checks": [
+          "signed-in",
+          "member"
+        ],
+        "effect": "access"
+      }
+    ],
+    "solution": "members"
+  },
+  {
+    "id": "MVP-02",
+    "slug": "tenant-isolation",
+    "title": "Tenant Isolation",
+    "version": 1,
+    "module": "authorization",
+    "difficulty": "Beginner",
+    "minutes": 12,
+    "prerequisites": [
+      "MVP-01"
+    ],
+    "objective": "Scope documents using verified tenant membership.",
+    "scenario": "Ledgerleaf is a fictional workspace service. Each organization can read documents stored within its own workspace.",
+    "routes": [
+      "GET /api/documents/:documentId"
+    ],
+    "invariants": {
+      "rule": "Scope documents using verified tenant membership."
+    },
+    "hints": [
+      "Find the trusted source of tenant membership.",
+      "Apply verified tenant scope to the initial lookup.",
+      "Compare the authenticated tenant to the owning tenant before returning a record."
+    ],
+    "cases": [
+      {
+        "id": "own-tenant",
+        "label": "A member reads a document in their tenant",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "allowed"
+        },
+        "group": "behavior",
+        "weight": 20
+      },
+      {
+        "id": "other-tenant",
+        "label": "Another tenant receives a restricted result",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "reader-b",
+            "tenant": "south",
+            "permissions": [
+              "read"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 30
+      },
+      {
+        "id": "unavailable",
+        "label": "An unavailable document reveals no details",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": null
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 10
+      },
+      {
+        "id": "trusted-context",
+        "label": "Verified context determines tenant scope",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          },
+          "suppliedTenant": "south"
+        },
+        "expected": {
+          "outcome": "allowed"
+        },
+        "group": "behavior",
+        "weight": 25
+      },
+      {
+        "id": "no-membership",
+        "label": "An account without a verified tenant is restricted",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "guest",
+            "permissions": [
+              "read"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 15
+      }
+    ],
+    "explanation": "Use the verified tenant in the real database lookup and in the authorizing rule. This simulation checks the scoped decision and its public outcome.",
+    "references": [
+      {
+        "label": "OWASP API Security Top 10 (2023) · API1",
+        "url": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/"
+      }
+    ],
+    "reasoning": [
+      {
+        "id": "principle",
+        "label": "Verified membership defines the workspace boundary."
+      },
+      {
+        "id": "alternate",
+        "label": "Only the document owner can read a tenant-wide record."
+      }
+    ],
+    "correctReason": "principle",
+    "mode": "choose-fix",
+    "options": [
+      {
+        "id": "owner-only",
+        "label": "Require verified tenant and ownership",
+        "checks": [
+          "tenant",
+          "owner"
+        ],
+        "effect": "access"
+      },
+      {
+        "id": "tenant-scope",
+        "label": "Require the verified tenant to match",
+        "checks": [
+          "signed-in",
+          "tenant"
+        ],
+        "effect": "access"
+      }
+    ],
+    "solution": "tenant-scope"
+  },
+  {
+    "id": "MVP-03",
+    "slug": "role-vs-permission",
+    "title": "Role vs Permission",
+    "version": 1,
+    "module": "authorization",
+    "difficulty": "Intermediate",
+    "minutes": 12,
+    "prerequisites": [
+      "MVP-02"
+    ],
+    "objective": "Require close permission, matching scope and an open ticket.",
+    "scenario": "Relay Desk routes fictional tickets to supervisors. An authorized supervisor may close an open ticket in their workspace.",
+    "routes": [
+      "POST /api/tickets/:ticketId/close"
+    ],
+    "invariants": {
+      "rule": "Require close permission, matching scope and an open ticket."
+    },
+    "hints": [
+      "A role name describes a group of privileges.",
+      "Check action scope and current business state together.",
+      "Allow close only when permission, tenant and open state all match."
+    ],
+    "cases": [
+      {
+        "id": "close",
+        "label": "A scoped supervisor closes an open ticket",
+        "invariant": "rule",
+        "action": "close",
+        "fixture": {
+          "actor": {
+            "id": "supervisor-a",
+            "tenant": "north",
+            "permissions": [
+              "close",
+              "edit",
+              "share"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "allowed",
+          "state": "closed"
+        },
+        "group": "behavior",
+        "weight": 1
+      },
+      {
+        "id": "no-permission",
+        "label": "A reader cannot close a ticket",
+        "invariant": "rule",
+        "action": "close",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 1
+      },
+      {
+        "id": "other-scope",
+        "label": "An out-of-scope supervisor cannot close",
+        "invariant": "rule",
+        "action": "close",
+        "fixture": {
+          "actor": {
+            "id": "owner-a",
+            "tenant": "south",
+            "permissions": [
+              "close",
+              "edit",
+              "share"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 1
+      },
+      {
+        "id": "closed",
+        "label": "A previously closed ticket stays closed",
+        "invariant": "rule",
+        "action": "close",
+        "fixture": {
+          "actor": {
+            "id": "owner-a",
+            "tenant": "north",
+            "permissions": [
+              "close",
+              "edit",
+              "share"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": false
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 1
+      }
+    ],
+    "explanation": "Evaluate ticket scope, explicit action permission and current state before updating. In a real service enforce the state condition atomically with the write.",
+    "references": [
+      {
+        "label": "OWASP API Security Top 10 (2023) · API5",
+        "url": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/"
+      }
+    ],
+    "reasoning": [
+      {
+        "id": "principle",
+        "label": "The permission applies to the action and tenant where the ticket is open."
+      },
+      {
+        "id": "alternate",
+        "label": "A supervisor must always personally own every ticket they close."
+      }
+    ],
+    "correctReason": "principle",
+    "mode": "choose-fix",
+    "options": [
+      {
+        "id": "permitted",
+        "label": "Require permission, tenant scope and open state",
+        "checks": [
+          "tenant",
+          "permission",
+          "open"
+        ],
+        "effect": "update"
+      },
+      {
+        "id": "assigned",
+        "label": "Additionally require personal ownership",
+        "checks": [
+          "tenant",
+          "permission",
+          "open",
+          "owner"
+        ],
+        "effect": "update"
+      }
+    ],
+    "solution": "permitted"
+  },
+  {
+    "id": "MVP-04",
+    "slug": "property-level-authorization",
+    "title": "Property-Level Authorization",
+    "version": 1,
+    "module": "authorization",
+    "difficulty": "Intermediate",
+    "minutes": 12,
+    "prerequisites": [
+      "MVP-03"
+    ],
+    "objective": "Return only the approved fields for the authorized audience.",
+    "scenario": "The fictional Commonroom directory provides team profiles. Owners can see their own contact preference. Internal metadata stays outside the public response model.",
+    "routes": [
+      "GET /api/profiles/:id"
+    ],
+    "invariants": {
+      "rule": "Return only the approved fields for the authorized audience."
+    },
+    "hints": [
+      "A permitted record can have fields with different audiences.",
+      "Authorize the record, then build a separate response.",
+      "Create a public field list and add contact preference only for the verified owner."
+    ],
+    "cases": [
+      {
+        "id": "team-fields",
+        "label": "A teammate sees display name and bio",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "allowed",
+          "fields": [
+            "display-name",
+            "bio"
+          ]
+        },
+        "group": "behavior",
+        "weight": 1
+      },
+      {
+        "id": "self-fields",
+        "label": "The owner also sees their contact preference",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "owner-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "allowed",
+          "fields": [
+            "display-name",
+            "bio",
+            "contact-preference"
+          ]
+        },
+        "group": "behavior",
+        "weight": 1
+      },
+      {
+        "id": "denied",
+        "label": "An unapproved viewer receives no profile fields",
+        "invariant": "rule",
+        "action": "read",
+        "fixture": {
+          "actor": {
+            "id": "reader-b",
+            "tenant": "south",
+            "permissions": [
+              "read"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 1
+      }
+    ],
+    "explanation": "Allowlist the exact response keys for each authorized audience. Construct a new response object so new internal fields remain private by default.",
+    "references": [
+      {
+        "label": "OWASP API Security Top 10 (2023) · API3",
+        "url": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/"
+      }
+    ],
+    "reasoning": [
+      {
+        "id": "principle",
+        "label": "Object access and visibility of individual properties are separate decisions."
+      },
+      {
+        "id": "alternate",
+        "label": "Every audience needs the same fixed representation."
+      }
+    ],
+    "correctReason": "principle",
+    "mode": "choose-fix",
+    "options": [
+      {
+        "id": "one-view",
+        "label": "Use the public field list for every viewer",
+        "checks": [
+          "tenant",
+          "visible"
+        ],
+        "effect": "profile",
+        "profile": "public"
+      },
+      {
+        "id": "audience",
+        "label": "Project fields by verified audience",
+        "checks": [
+          "tenant",
+          "visible"
+        ],
+        "effect": "profile",
+        "profile": "by-audience"
+      }
+    ],
+    "solution": "audience"
+  },
+  {
+    "id": "MVP-05",
+    "slug": "validate-inputs-and-limit-work",
+    "title": "Validate Inputs and Limit Work",
+    "version": 1,
+    "module": "resource-protection",
+    "difficulty": "Intermediate",
+    "minutes": 12,
+    "prerequisites": [
+      "MVP-04"
+    ],
+    "objective": "Validate pagination before accessing records.",
+    "scenario": "The fictional Stockroom catalog defaults to page 1 with 20 items. It accepts page numbers 1–1000 and sizes 1–50. Invalid input must return a clear validation response before doing any reads.",
+    "routes": [
+      "GET /api/items?page=…&pageSize=…"
+    ],
+    "invariants": {
+      "rule": "Validate pagination before accessing records."
+    },
+    "hints": [
+      "Work out the input contract before deciding how to fetch.",
+      "Distinguish omitted values from malformed or ambiguous input.",
+      "Reject input outside page 1–1000 and size 1–50 before reading data."
+    ],
+    "cases": [
+      {
+        "id": "defaults",
+        "label": "Omitted values use documented defaults",
+        "invariant": "rule",
+        "action": "list",
+        "fixture": {
+          "actor": {
+            "id": "owner-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": null
+        },
+        "expected": {
+          "outcome": "allowed",
+          "page": 1,
+          "size": 20
+        },
+        "group": "behavior",
+        "weight": 1
+      },
+      {
+        "id": "edge",
+        "label": "Maximum accepted values are handled",
+        "invariant": "rule",
+        "action": "list",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": null,
+          "page": "1000",
+          "size": "50"
+        },
+        "expected": {
+          "outcome": "allowed",
+          "page": 1000,
+          "size": 50
+        },
+        "group": "boundary",
+        "weight": 1
+      },
+      {
+        "id": "bad-size",
+        "label": "An out-of-range value performs no reads",
+        "invariant": "rule",
+        "action": "list",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": null,
+          "size": "51"
+        },
+        "expected": {
+          "outcome": "invalid-input",
+          "reads": 0
+        },
+        "group": "boundary",
+        "weight": 1
+      },
+      {
+        "id": "malformed",
+        "label": "Non-integer input performs no reads",
+        "invariant": "rule",
+        "action": "list",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": null,
+          "page": "1.2"
+        },
+        "expected": {
+          "outcome": "invalid-input",
+          "reads": 0
+        },
+        "group": "boundary",
+        "weight": 1
+      },
+      {
+        "id": "duplicate",
+        "label": "An ambiguous input performs no reads",
+        "invariant": "rule",
+        "action": "list",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": null,
+          "size": "20,30"
+        },
+        "expected": {
+          "outcome": "invalid-input",
+          "reads": 0
+        },
+        "group": "boundary",
+        "weight": 1
+      },
+      {
+        "id": "signed-in",
+        "label": "Signed-in catalog viewers can list",
+        "invariant": "rule",
+        "action": "list",
+        "fixture": {
+          "actor": {
+            "id": "catalog-reader",
+            "permissions": []
+          },
+          "resource": null
+        },
+        "expected": {
+          "outcome": "allowed",
+          "page": 1,
+          "size": 20
+        },
+        "group": "behavior",
+        "weight": 1
+      }
+    ],
+    "explanation": "Validate each parameter once, apply defaults only when omitted and perform zero reads on validation failure. Real endpoints should also set query cost and rate limits.",
+    "references": [
+      {
+        "label": "OWASP API Security Top 10 (2023) · API4",
+        "url": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/"
+      }
+    ],
+    "reasoning": [
+      {
+        "id": "principle",
+        "label": "Early bounds make the requested work predictable."
+      },
+      {
+        "id": "alternate",
+        "label": "A permission check alone controls the amount of work."
+      }
+    ],
+    "correctReason": "principle",
+    "mode": "choose-fix",
+    "options": [
+      {
+        "id": "permission-first",
+        "label": "Require a catalog permission before validation",
+        "checks": [
+          "permission",
+          "valid-page"
+        ],
+        "effect": "page"
+      },
+      {
+        "id": "bounded",
+        "label": "Validate bounded pagination for signed-in viewers",
+        "checks": [
+          "signed-in",
+          "valid-page"
+        ],
+        "effect": "page"
+      }
+    ],
+    "solution": "bounded"
+  },
+  {
+    "id": "MVP-06",
+    "slug": "least-privilege-capstone",
+    "title": "Least-Privilege Capstone",
+    "version": 1,
+    "module": "capstones",
+    "difficulty": "Advanced",
+    "minutes": 25,
+    "prerequisites": [
+      "MVP-05"
+    ],
+    "objective": "Apply the minimum permissions for each document action.",
+    "scenario": "The fictional Papertrail workspace distinguishes listing, editing and sharing. Configure each action to match the documented permissions and resource boundary.",
+    "routes": [
+      "GET /api/workspaces/:id/docs",
+      "PATCH /api/docs/:id",
+      "POST /api/docs/:id/share"
+    ],
+    "invariants": {
+      "rule": "Apply the minimum permissions for each document action."
+    },
+    "hints": [
+      "Check how each operation changes or reveals data.",
+      "Give every action a separate permission in the verified workspace.",
+      "Use the tenant boundary and exact action permission for every supported operation."
+    ],
+    "cases": [
+      {
+        "id": "list",
+        "label": "A verified member can list workspace documents",
+        "invariant": "rule",
+        "action": "list",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "allowed"
+        },
+        "group": "behavior",
+        "weight": 1
+      },
+      {
+        "id": "edit",
+        "label": "An editor may edit the document",
+        "invariant": "rule",
+        "action": "edit",
+        "fixture": {
+          "actor": {
+            "id": "editor-a",
+            "tenant": "north",
+            "permissions": [
+              "close",
+              "edit",
+              "share"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "allowed",
+          "state": "edited"
+        },
+        "group": "behavior",
+        "weight": 1
+      },
+      {
+        "id": "share",
+        "label": "A delegated teammate may share the document",
+        "invariant": "rule",
+        "action": "share",
+        "fixture": {
+          "actor": {
+            "id": "editor-a",
+            "tenant": "north",
+            "permissions": [
+              "close",
+              "edit",
+              "share"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "allowed",
+          "state": "shared"
+        },
+        "group": "behavior",
+        "weight": 1
+      },
+      {
+        "id": "denied-share",
+        "label": "A reader cannot share",
+        "invariant": "rule",
+        "action": "share",
+        "fixture": {
+          "actor": {
+            "id": "reader-a",
+            "tenant": "north",
+            "permissions": [
+              "read",
+              "list"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 1
+      },
+      {
+        "id": "foreign-edit",
+        "label": "An out-of-scope editor cannot edit",
+        "invariant": "rule",
+        "action": "edit",
+        "fixture": {
+          "actor": {
+            "id": "owner-a",
+            "tenant": "south",
+            "permissions": [
+              "close",
+              "edit",
+              "share"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 1
+      },
+      {
+        "id": "other-action",
+        "label": "An action outside the policy matrix is restricted",
+        "invariant": "rule",
+        "action": "close",
+        "fixture": {
+          "actor": {
+            "id": "owner-a",
+            "tenant": "north",
+            "permissions": [
+              "close",
+              "edit",
+              "share"
+            ]
+          },
+          "resource": {
+            "tenant": "north",
+            "owner": "owner-a",
+            "members": [
+              "reader-a",
+              "owner-a"
+            ],
+            "visibility": "team",
+            "open": true
+          }
+        },
+        "expected": {
+          "outcome": "restricted"
+        },
+        "group": "boundary",
+        "weight": 1
+      }
+    ],
+    "explanation": "Use a shared tenant guard and an explicit permission per action. A real edit should also allowlist writable fields and apply permission and update atomically.",
+    "references": [
+      {
+        "label": "OWASP API Security Top 10 (2023) · API1 / API5",
+        "url": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/"
+      }
+    ],
+    "reasoning": [
+      {
+        "id": "principle",
+        "label": "Each operation has an explicit permission inside the workspace boundary."
+      },
+      {
+        "id": "alternate",
+        "label": "Ownership is required for every operation."
+      }
+    ],
+    "correctReason": "principle",
+    "mode": "policy-editor",
+    "rules": [
+      {
+        "action": "list",
+        "options": [
+          {
+            "id": "scoped-list",
+            "label": "List within the verified tenant with list permission",
+            "checks": [
+              "tenant",
+              "permission"
+            ],
+            "effect": "access"
+          },
+          {
+            "id": "owner-list",
+            "label": "Require ownership to list",
+            "checks": [
+              "tenant",
+              "permission",
+              "owner"
+            ],
+            "effect": "access"
+          }
+        ],
+        "solution": "scoped-list"
+      },
+      {
+        "action": "edit",
+        "options": [
+          {
+            "id": "scoped-edit",
+            "label": "Require edit permission in the verified tenant",
+            "checks": [
+              "tenant",
+              "permission"
+            ],
+            "effect": "update"
+          },
+          {
+            "id": "owner-edit",
+            "label": "Require ownership for every edit",
+            "checks": [
+              "tenant",
+              "permission",
+              "owner"
+            ],
+            "effect": "update"
+          }
+        ],
+        "solution": "scoped-edit"
+      },
+      {
+        "action": "share",
+        "options": [
+          {
+            "id": "scoped-share",
+            "label": "Require share permission in the verified tenant",
+            "checks": [
+              "tenant",
+              "permission"
+            ],
+            "effect": "update"
+          },
+          {
+            "id": "owner-share",
+            "label": "Require ownership for every share",
+            "checks": [
+              "tenant",
+              "permission",
+              "owner"
+            ],
+            "effect": "update"
+          }
+        ],
+        "solution": "scoped-share"
+      }
+    ]
+  }
+]
