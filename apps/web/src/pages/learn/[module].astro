@@ -1,0 +1,27 @@
+---
+import Page from "../../layouts/Page.astro";
+import { modules } from "../../features/progress/modules";
+import { cards } from "../../features/progress/cards";
+import { LabCards } from "../../features/progress/ProgressPanel";
+export function getStaticPaths() {
+  return modules.map((module) => ({
+    params: { module: module.slug },
+    props: { module },
+  }));
+}
+const { module } = Astro.props;
+const labs = cards.filter((lab) => lab.module === module.slug);
+---
+
+<Page title={module.title + " · SecureLab"}>
+  <p><a href="/learn/">Curriculum</a></p>
+  <h1>{module.title}</h1>
+  <p>{module.description}</p>
+  {
+    labs.length ? (
+      <LabCards client:load {labs} />
+    ) : (
+      <p>Lessons for this module are planned for a future release.</p>
+    )
+  }
+</Page>

@@ -17,7 +17,7 @@ export const resource = {
   visibility: "team",
   open: true,
 } as const;
-export const project: AssessmentCase["fixture"]["resource"] = {
+export const project: NonNullable<AssessmentCase["fixture"]["resource"]> = {
   ...resource,
   members: [...resource.members],
 };

@@ -42,12 +42,22 @@ const canonical = Astro.site && new URL(Astro.url.pathname, Astro.site);
             height="28"
           />SecureLab</a
         >
-        <nav aria-label="Main"><slot name="navigation" /></nav>
+        <nav aria-label="Main">
+          <a href="/learn/">Learn</a><a href="/labs/">Labs</a><a
+            href="/progress/">Progress</a>
+        </nav>
       </div>
     </header>
     <main id="content"><slot /></main>
     <footer>
-      <slot name="footer" />
+      <nav aria-label="Resources">
+        <a href="/glossary/">Glossary</a><a href="/about/">About</a><a
+          href="/contribute/">Contribute</a
+        >
+        <a href="/privacy/">Privacy</a><a href="/accessibility/"
+          >Accessibility</a
+        >
+      </nav>
       <small class="muted" id="offline-status" role="status"></small>
     </footer>
   </body>
@@ -82,6 +92,16 @@ const canonical = Astro.site && new URL(Astro.url.pathname, Astro.site);
   }
   main {
     padding-block: clamp(2rem, 6vw, 5rem);
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+  }
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
   footer {
     padding-block: 1.5rem;
