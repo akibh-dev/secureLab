@@ -12,14 +12,14 @@
 |---|---|---|
 | [x] F1 | Record stack, architecture boundaries and owner inputs | Decision record names the six-lab MVP, static build and local progress model. |
 | [x] F2 | Create the workspaces and static shell | Fresh install serves a homepage and builds a top-level 404.html. |
-| [ ] F3 | Connect local checks and mirrored-main CI | Local checks pass; record a GitHub Actions run for the same SHA as Forgejo main. |
+| [x] F3 | Connect local checks and mirrored-main CI | Local checks pass; record a GitHub Actions run for the same SHA as Forgejo main. |
 | [x] F4 | Publish the first handoff | Design and engine owners can each start from the same SHA and locate their write areas. |
 
 ## Foundation handoff
 
 The [foundation decision](../docs/decisions/0001-static-foundation.md) records the architecture and owner inputs. The [root README](../README.md) gives the clean-build and verification commands. Start design and engine work from the initial foundation commit on main. The catalog contract and examples live in packages/lab-schema/src.
 
-F3 includes a host-side acceptance test. The foundation workflow runs lint, type checks, catalog validation, unit tests, build and browser checks. For the updated delivery workflow, attach the Forgejo PR and the successful GitHub run for its mirrored main SHA when available.
+F3 includes a host-side acceptance test. The foundation workflow runs lint, type checks, catalog validation, unit tests, build and browser checks. Forgejo main and GitHub matched at df6cc7e after the workflow merge. [Forgejo PR #1](https://git.akibh.dev/akib/secureLab/pulls/1) · [Passing GitHub CI](https://github.com/akibh-dev/secureLab/actions/runs/44664076994)
 
 ## Implementation details
 

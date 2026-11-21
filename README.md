@@ -1,6 +1,6 @@
 # SecureLab
 
-SecureLab is an interactive API security academy in development. The foundation includes a static Astro homepage, a custom missing-page route and workspace packages for the six planned lessons.
+SecureLab is an interactive API security academy with six fictional lessons. Each lesson runs local checks against a defensive policy and saves progress in the browser.
 
 ## Local development
 
@@ -31,4 +31,4 @@ The browser test starts the built site's preview server. For local machines with
 
 Design and engine contributors start from the same foundation commit on main. Record `git rev-parse HEAD` when claiming a ticket. Design owns packages/ui and the brand assets. Engine owns packages/core and packages/lab-schema. Catalog tests illustrate the shared summary contract. Open one phase-end PR to main on Forgejo. The foundation CI job runs on GitHub after the mirror pushes main. See the [agent workflow](agents.md).
 
-[Delivery plan](plan/README.md) · [Foundation decision](docs/decisions/0001-static-foundation.md) · [Design assignment](plan/01-design-system.md) · [Engine assignment](plan/02-schema-and-engine.md)
+[Release handoff](docs/RELEASE.md) · [Delivery plan](plan/README.md) · [Foundation decision](docs/decisions/0001-static-foundation.md) · [Design assignment](plan/01-design-system.md) · [Engine assignment](plan/02-schema-and-engine.md)
